@@ -1,7 +1,13 @@
 body{
     padding-top:50px;
 }
+root-container{
+    padding-top:50px;
+}
 .home-content{
     text-align:center;
     padding:40px 20px;
+}
+.auto-width{
+    width:auto !important;
 }
