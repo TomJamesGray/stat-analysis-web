@@ -89,6 +89,7 @@ def view_project(project_id):
         truncated = False
     print("Setting project_data")
     session["project_data"] = data
+    session["project_headers"] = headers
 
     return render_template("view_project.html",headers=headers,view_data=view_data,
                            truncated=truncated,project_name=project.project_name,rows=len(data))
@@ -106,7 +107,6 @@ def project_search():
         # Use WTForms?
         cols = request.form.getlist("column_select[]")
         regexes = request.form.getlist("regex_search[]")
-        print("Columns: {}\nRegexes: {}".format(cols,regexes))
         output = []
         for row in session["project_data"]:
             matched = 0
@@ -115,5 +115,4 @@ def project_search():
                     matched += 1
             if matched == len(cols):
                 output.append(row)
-
-        return str(output)
+        return render_template("search_results.html",data=output,headers=session["project_headers"])
