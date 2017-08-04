@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+{% block body %}
+    <div class="container root-container">
+        <h2 class="text-center">View projects</h2>
+        <table class="table table-hover">
+            <tbody>
+                <tr>
+                    <th>Project name</th>
+                </tr>
+                {% for project in projects %}
+                    <tr>
+                        <td><a href="{{ url_for('view_project',project_name=project.project_name) }}" >{{ project.project_name }}</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

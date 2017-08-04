@@ -1,7 +1,6 @@
 import argparse
 import logging
 import os
-# from stat_analysis import views
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired
 from wtforms import StringField
@@ -57,5 +56,16 @@ def new():
             print(form.errors)
             print("Stuff missing??")
 
-
     return render_template("new_project.html")
+
+
+@app.route("/view")
+def view():
+    projects = Project.query.all()
+    print(projects)
+    return render_template("view_projects.html", projects=projects)
+
+@app.route("/view/<project_name>")
+def view_project(project_name):
+    # Read data from data file
+    return project_name
