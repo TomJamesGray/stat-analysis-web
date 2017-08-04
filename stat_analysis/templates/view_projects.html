@@ -9,7 +9,7 @@
                 </tr>
                 {% for project in projects %}
                     <tr>
-                        <td><a href="{{ url_for('view_project',project_name=project.project_name) }}" >{{ project.project_name }}</a></td>
+                        <td><a href="{{ url_for('view_project',project_id=project.id) }}" >{{ project.project_name }}</a></td>
                     </tr>
                 {% endfor %}
             </tbody>

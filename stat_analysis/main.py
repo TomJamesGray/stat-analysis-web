@@ -1,6 +1,7 @@
-import argparse
 import logging
 import os
+import csv
+from collections import OrderedDict
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired
 from wtforms import StringField
@@ -59,13 +60,30 @@ def new():
     return render_template("new_project.html")
 
 
+@app.route("/view/<project_id>")
+def view_project(project_id):
+    # Read data from data file
+    # Assuming there is a header row
+    project = Project.query.filter_by(id=project_id).first()
+    print(project)
+    with open("/home/tom/uploads/{}".format(project.dataset_location),'r') as f:
+        print(f)
+        reader = csv.reader(f)
+        headers = next(reader)
+        data = []
+        for row in reader:
+            tmp = OrderedDict()
+            for i,val in enumerate(row):
+                tmp[headers[i]] = val
+            data.append(tmp)
+
+        print(data)
+
+    return render_template("view_project.html",headers=headers,data=data,project_name=project.project_name)
+
+
 @app.route("/view")
 def view():
     projects = Project.query.all()
     print(projects)
     return render_template("view_projects.html", projects=projects)
-
-@app.route("/view/<project_name>")
-def view_project(project_name):
-    # Read data from data file
-    return project_name
