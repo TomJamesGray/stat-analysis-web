@@ -1,19 +1,25 @@
 import logging
 import os
 import csv
+import re
+import redis
 from collections import OrderedDict
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired
 from wtforms import StringField
-from flask import Flask,render_template,request,flash,redirect,url_for,g
+from flask import Flask,render_template,request,flash,redirect,url_for,session
 from flask_sqlalchemy import SQLAlchemy
+from flask_kvsession import KVSessionExtension
+from simplekv.memory.redisstore import RedisStore
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import CombinedMultiDict
 
 logger = logging.getLogger(__name__)
+store = RedisStore(redis.StrictRedis())
 app = Flask(__name__)
 app.config.from_object('stat_analysis.config')
 app.secret_key = "SECRET"
+KVSessionExtension(store,app)
 
 db = SQLAlchemy(app)
 
@@ -30,7 +36,6 @@ class Project(db.Model):
 class NewProjectForm(FlaskForm):
     project_name = StringField("project_name")
     upload_data = FileField(validators=[FileRequired()])
-
 
 @app.route("/")
 def index():
@@ -82,8 +87,8 @@ def view_project(project_id):
     else:
         view_data = data
         truncated = False
-
-    g.project_data = data
+    print("Setting project_data")
+    session["project_data"] = data
 
     return render_template("view_project.html",headers=headers,view_data=view_data,
                            truncated=truncated,project_name=project.project_name,rows=len(data))
@@ -94,3 +99,21 @@ def view():
     projects = Project.query.all()
     print(projects)
     return render_template("view_projects.html", projects=projects)
+
+@app.route("/search", methods=["GET","POST"])
+def project_search():
+    if request.method == "POST":
+        # Use WTForms?
+        cols = request.form.getlist("column_select[]")
+        regexes = request.form.getlist("regex_search[]")
+        print("Columns: {}\nRegexes: {}".format(cols,regexes))
+        output = []
+        for row in session["project_data"]:
+            matched = 0
+            for i in range(0,len(cols)):
+                if re.search(regexes[i],row[cols[i]]):
+                    matched += 1
+            if matched == len(cols):
+                output.append(row)
+
+        return str(output)
