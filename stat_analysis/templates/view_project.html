@@ -40,7 +40,31 @@
                 </div>
                 <div id="search" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
                     <div class="panel-body">
-                        Search Stuff
+                        <form method="post" class="auto-width">
+                            <fieldset id="search_rows">
+                                <table class="table auto-width" id="search_rows_tbl">
+                                    <tbody>
+                                        <tr class="search_row">
+                                            <td>
+                                                <select name="column_select[]">
+                                                    {% for header in headers %}
+                                                        <option value="{{ header }}">{{ header }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <input type="text" name="regex_search[]" placeholder="Regex search pattern">
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-danger remove_search_row" type="button" disabled="disabled">-</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <button class="btn btn-success" id="add_search_row" type="button">+</button>
+                            </fieldset>
+                            <button type="submit" class="btn btn-primary">Search</button>
+                        </form>
                     </div>
                 </div>
             </div>
