@@ -2,6 +2,64 @@
 {% block body %}
     <div class="container root-container">
         <h2 class="text-center">{{ project_name }}</h2>
+        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="informationHead">
+                    <h4 class="panel-title">
+                        <a role="button" data-toggle="collapse" data-parent="#accordion" href="#information"
+                           aria-expanded="true" aria-controls="information">
+                            Information
+                        </a>
+                    </h4>
+                </div>
+                <div id="information" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+                    <div class="panel-body">
+                        <table class="table auto-width">
+                            <tbody>
+                                <tr>
+                                    <td><b>Columns: </b></td>
+                                    <td>{{ headers|length }}</td>
+                                </tr>
+                                <tr>
+                                    <td><b>Rows: </b></td>
+                                    <td>{{ rows }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="searchHead">
+                    <h4 class="panel-title">
+                        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion"
+                           href="#search" aria-expanded="false" aria-controls="collapseTwo">
+                            Search
+                        </a>
+                    </h4>
+                </div>
+                <div id="search" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+                    <div class="panel-body">
+                        Search Stuff
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="collateHead">
+                    <h4 class="panel-title">
+                        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion"
+                           href="#collate" aria-expanded="false" aria-controls="collapseThree">
+                            Collate data
+                        </a>
+                    </h4>
+                </div>
+                <div id="collate" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+                    <div class="panel-body">
+                        Collate stuff
+                    </div>
+                </div>
+            </div>
+        </div>
         <table class="table table-hover">
             <tbody>
                 <tr>
@@ -9,13 +67,18 @@
                         <th>{{ header }}</th>
                     {% endfor %}
                 </tr>
-                {% for row in data %}
+                {% for row in view_data %}
                     <tr>
                         {% for _,val in row.items() %}
                                 <td>{{ val }}</td>
                         {% endfor %}
                     </tr>
                 {% endfor %}
+                {% if truncated %}
+                    <tr>
+                        <td colspan="{{ headers|length }}" class="text-center text-primary">View All Data</td>
+                    </tr>
+                {% endif %}
             </tbody>
         </table>
     </div>

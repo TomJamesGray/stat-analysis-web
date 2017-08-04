@@ -5,7 +5,7 @@ from collections import OrderedDict
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired
 from wtforms import StringField
-from flask import Flask,render_template,request,flash,redirect,url_for
+from flask import Flask,render_template,request,flash,redirect,url_for,g
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import CombinedMultiDict
@@ -67,7 +67,6 @@ def view_project(project_id):
     project = Project.query.filter_by(id=project_id).first()
     print(project)
     with open("/home/tom/uploads/{}".format(project.dataset_location),'r') as f:
-        print(f)
         reader = csv.reader(f)
         headers = next(reader)
         data = []
@@ -77,9 +76,17 @@ def view_project(project_id):
                 tmp[headers[i]] = val
             data.append(tmp)
 
-        print(data)
+    if len(data) > 10:
+        view_data = data[:10]
+        truncated = True
+    else:
+        view_data = data
+        truncated = False
 
-    return render_template("view_project.html",headers=headers,data=data,project_name=project.project_name)
+    g.project_data = data
+
+    return render_template("view_project.html",headers=headers,view_data=view_data,
+                           truncated=truncated,project_name=project.project_name,rows=len(data))
 
 
 @app.route("/view")
