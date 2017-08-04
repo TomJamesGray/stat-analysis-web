@@ -79,7 +79,42 @@
                 </div>
                 <div id="collate" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
                     <div class="panel-body">
-                        Collate stuff
+                        <form method="post" class="auto-width" action="{{ url_for('project_collate_data') }}">
+                            <div class="form-group">
+                                <label for="condition_col">
+                                    Column:
+                                </label>
+                                <select name="condition_col" id="condition_col">
+                                    {% for header in headers %}
+                                    <option value="{{ header }}">{{ header }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label for="condition">
+                                    Condition:
+                                </label>
+                                <select name="condition" id="condition">
+                                    <option value="matches">Matches</option>
+                                    <option value="in_range">In Range</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="action">
+                                    Action:
+                                </label>
+                                <select name="action" id="action">
+                                    <option value="sum">Sum</option>
+                                </select>
+                                <label for="action_col">
+                                    Column:
+                                </label>
+                                <select name="action_col" id="action_col">
+                                    {% for header in headers %}
+                                        <option value="{{ header }}">{{ header }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Collate</button>
+                        </form>
                     </div>
                 </div>
             </div>

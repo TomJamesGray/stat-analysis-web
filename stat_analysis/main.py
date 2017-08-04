@@ -3,6 +3,8 @@ import os
 import csv
 import re
 import redis
+import stat_analysis.collate.conditions
+import stat_analysis.collate.actions
 from collections import OrderedDict
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired
@@ -36,6 +38,12 @@ class Project(db.Model):
 class NewProjectForm(FlaskForm):
     project_name = StringField("project_name")
     upload_data = FileField(validators=[FileRequired()])
+
+class CollateDataForm(FlaskForm):
+    condition = StringField()
+    condition_col = StringField()
+    action = StringField()
+    action_col = StringField()
 
 @app.route("/")
 def index():
@@ -101,6 +109,7 @@ def view():
     print(projects)
     return render_template("view_projects.html", projects=projects)
 
+
 @app.route("/search", methods=["GET","POST"])
 def project_search():
     if request.method == "POST":
@@ -116,3 +125,22 @@ def project_search():
             if matched == len(cols):
                 output.append(row)
         return render_template("search_results.html",data=output,headers=session["project_headers"])
+
+
+@app.route("/collate",methods=["GET","POST"])
+def project_collate_data():
+    collate_conditions = {
+        "matches":stat_analysis.collate.conditions.matches
+    }
+    collate_actions = {
+        "sum":stat_analysis.collate.actions.sum
+    }
+    if request.method == "POST":
+        form = CollateDataForm(request.form,csrf_enabled=False)
+        if form.validate_on_submit():
+            collate_func = collate_conditions[form.condition.data]
+            collate_data = collate_func(session["project_data"],form.condition_col.data)
+            action_func = collate_actions[form.action.data]
+            final_data = action_func(collate_data,form.action_col.data)
+
+            return str(final_data)
