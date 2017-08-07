@@ -114,6 +114,7 @@ def view_project(project_id):
     session["project_data"] = data
     session["project_headers"] = headers
     session["project_id"] = project_id
+    session["active_data"] = "project"
 
     return render_template("view_data.html",headers=headers,view_data=view_data,
                            truncated=truncated,project_name=project.project_name,rows=len(data),
@@ -134,14 +135,15 @@ def project_search():
         cols = request.form.getlist("column_select[]")
         regexes = request.form.getlist("regex_search[]")
         output = []
-        for row in session["project_data"]:
+        for row in session["{}_data".format(session["active_data"])]:
             matched = 0
             for i in range(0,len(cols)):
                 if re.search(regexes[i],row[cols[i]]):
                     matched += 1
             if matched == len(cols):
                 output.append(row)
-        return render_template("search_results.html",data=output,headers=session["project_headers"])
+        return render_template("search_results.html",data=output,
+                               headers=session["{}_headers".format(session["active_data"])])
 
 
 @app.route("/collate",methods=["GET","POST"])
@@ -157,11 +159,17 @@ def project_collate_data():
         if form.validate_on_submit():
             output_data = collate_data(form.condition.data,form.condition_col.data,
                                        form.action.data,form.action_col.data)
+
+            session["collate_data"] = output_data
+            session["active_data"] = "collate"
+            session["collate_headers"] = [form.condition_col.data,form.action_col.data]
+
             # Set session variables so collate data commands can be saved
             session["collate_data_condition"] = form.condition.data
             session["collate_data_condition_col"] = form.condition_col.data
             session["collate_data_action"] = form.action.data
             session["collate_data_action_col"] = form.action_col.data
+
 
             return render_template("view_data.html",view_data=output_data,headers=[
                 form.condition_col.data,form.action_col.data],already_collated=True)
@@ -186,7 +194,9 @@ def save_collated():
 def view_collate_data(collate_id):
     save = CollateDataSave.query.filter_by(id=collate_id).first()
     data = collate_data(save.condition,save.condition_col,save.action,save.action_col)
-
+    session["active_data"] = "collate"
+    session["collate_data"] = data
+    session["collate_headers"] = [save.condition_col, save.action_col]
     # return render_template("collate_output.html", data=data, headers=[
     #     save.condition_col, save.action_col], name=save.save_name)
     return render_template("view_data.html",headers=[save.condition_col, save.action_col],view_data=data,
