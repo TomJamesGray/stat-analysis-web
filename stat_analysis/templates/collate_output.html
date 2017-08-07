@@ -14,6 +14,7 @@
                 <button type="submit" class="btn btn-primary">Save Collated Data</button>
             </form>
         {% endif %}
+
         <p><b>Results:</b> {{ data|length }}</p>
         {{ table.table_view(headers,data,truncated) }}
     </div>

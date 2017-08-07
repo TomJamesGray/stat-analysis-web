@@ -115,7 +115,7 @@ def view_project(project_id):
     session["project_headers"] = headers
     session["project_id"] = project_id
 
-    return render_template("view_project.html",headers=headers,view_data=view_data,
+    return render_template("view_data.html",headers=headers,view_data=view_data,
                            truncated=truncated,project_name=project.project_name,rows=len(data),
                            collate_data_saves=collate_data_saves)
 
@@ -163,7 +163,7 @@ def project_collate_data():
             session["collate_data_action"] = form.action.data
             session["collate_data_action_col"] = form.action_col.data
 
-            return render_template("collate_output.html",data=output_data,headers=[
+            return render_template("view_data.html",view_data=output_data,headers=[
                 form.condition_col.data,form.action_col.data])
 
 
@@ -187,8 +187,10 @@ def view_collate_data(collate_id):
     save = CollateDataSave.query.filter_by(id=collate_id).first()
     data = collate_data(save.condition,save.condition_col,save.action,save.action_col)
 
-    return render_template("collate_output.html", data=data, headers=[
-        save.condition_col, save.action_col], name=save.save_name)
+    # return render_template("collate_output.html", data=data, headers=[
+    #     save.condition_col, save.action_col], name=save.save_name)
+    return render_template("view_data.html",headers=[save.condition_col, save.action_col],view_data=data,
+                           project_name=save.save_name,already_collated=True)
 
 
 def collate_data(c_func_name,c_col,a_func_name,a_col):
