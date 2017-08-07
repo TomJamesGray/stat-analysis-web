@@ -36,7 +36,7 @@ class Project(db.Model):
 
 class CollateDataSave(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id"), index=True)
     save_name = db.Column(db.String(50), index=False)
     condition = db.Column(db.String(50), index=False)
     condition_col = db.Column(db.String(50), index=False)
@@ -91,6 +91,8 @@ def view_project(project_id):
     # Read data from data file
     # Assuming there is a header row
     project = Project.query.filter_by(id=project_id).first()
+    collate_data_saves = CollateDataSave.query.filter_by(project_id=project_id).all()
+
     print(project)
     with open("/home/tom/uploads/{}".format(project.dataset_location),'r') as f:
         reader = csv.reader(f)
@@ -114,7 +116,8 @@ def view_project(project_id):
     session["project_id"] = project_id
 
     return render_template("view_project.html",headers=headers,view_data=view_data,
-                           truncated=truncated,project_name=project.project_name,rows=len(data))
+                           truncated=truncated,project_name=project.project_name,rows=len(data),
+                           collate_data_saves=collate_data_saves)
 
 
 @app.route("/view")
@@ -152,24 +155,17 @@ def project_collate_data():
     if request.method == "POST":
         form = CollateDataForm(request.form,csrf_enabled=False)
         if form.validate_on_submit():
-            collate_func = collate_conditions[form.condition.data]
-            collate_data = collate_func(session["project_data"],form.condition_col.data)
-            action_func = collate_actions[form.action.data]
-            final_data = action_func(collate_data,form.action_col.data)
+            output_data = collate_data(form.condition.data,form.condition_col.data,
+                                       form.action.data,form.action_col.data)
             # Set session variables so collate data commands can be saved
             session["collate_data_condition"] = form.condition.data
             session["collate_data_condition_col"] = form.condition_col.data
             session["collate_data_action"] = form.action.data
             session["collate_data_action_col"] = form.action_col.data
-            # Change the format of the final_data output so it's the same format as the
-            # view raw project data for example
-            output_data = []
-            for key,val in final_data.items():
-                output_data.append({form.condition_col.data: key,
-                                   form.action_col.data: val})
 
             return render_template("collate_output.html",data=output_data,headers=[
                 form.condition_col.data,form.action_col.data])
+
 
 @app.route("/collate/save",methods=["POST"])
 def save_collated():
@@ -184,3 +180,33 @@ def save_collated():
         db.session.commit()
 
         return redirect(url_for("view_project",project_id=session["project_id"]))
+
+
+@app.route("/collate/view/<collate_id>")
+def view_collate_data(collate_id):
+    save = CollateDataSave.query.filter_by(id=collate_id).first()
+    data = collate_data(save.condition,save.condition_col,save.action,save.action_col)
+
+    return render_template("collate_output.html", data=data, headers=[
+        save.condition_col, save.action_col], name=save.save_name)
+
+
+def collate_data(c_func_name,c_col,a_func_name,a_col):
+    collate_conditions = {
+        "matches": stat_analysis.collate.conditions.matches
+    }
+    collate_actions = {
+        "sum": stat_analysis.collate.actions.sum
+    }
+    c_func = collate_conditions[c_func_name]
+    collate_data = c_func(session["project_data"], c_col)
+    a_func = collate_actions[a_func_name]
+    final_data = a_func(collate_data, a_col)
+
+    # Change the format of the final_data output so it's the same format as the
+    # view raw project data for example
+    output_data = []
+    for key, val in final_data.items():
+        output_data.append({c_col: key, a_col: val})
+
+    return output_data
