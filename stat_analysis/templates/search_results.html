@@ -1,28 +1,9 @@
 {% extends "layout.html" %}
+{% import "table.html" as table %}
 {% block body %}
     <div class="container root-container">
         <h2>Search</h2>
         <p><b>Results:</b> {{ data|length }}</p>
-        <table class="table table-hover">
-            <tbody>
-                <tr>
-                    {% for header in headers %}
-                        <th>{{ header }}</th>
-                    {% endfor %}
-                </tr>
-                {% for row in data %}
-                    <tr>
-                        {% for _,val in row.items() %}
-                                <td>{{ val }}</td>
-                        {% endfor %}
-                    </tr>
-                {% endfor %}
-                {% if truncated %}
-                    <tr>
-                        <td colspan="{{ headers|length }}" class="text-center text-primary">View All Data</td>
-                    </tr>
-                {% endif %}
-            </tbody>
-        </table>
+        {{ table.table_view(headers,data,truncated) }}
     </div>
 {% endblock %}

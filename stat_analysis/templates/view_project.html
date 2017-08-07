@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% import "table.html" as table %}
 {% block body %}
     <div class="container root-container">
         <h2 class="text-center">{{ project_name }}</h2>
@@ -119,26 +120,6 @@
                 </div>
             </div>
         </div>
-        <table class="table table-hover">
-            <tbody>
-                <tr>
-                    {% for header in headers %}
-                        <th>{{ header }}</th>
-                    {% endfor %}
-                </tr>
-                {% for row in view_data %}
-                    <tr>
-                        {% for _,val in row.items() %}
-                                <td>{{ val }}</td>
-                        {% endfor %}
-                    </tr>
-                {% endfor %}
-                {% if truncated %}
-                    <tr>
-                        <td colspan="{{ headers|length }}" class="text-center text-primary">View All Data</td>
-                    </tr>
-                {% endif %}
-            </tbody>
-        </table>
+        {{ table.table_view(headers,view_data,truncated) }}
     </div>
 {% endblock %}
