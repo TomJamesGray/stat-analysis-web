@@ -34,10 +34,23 @@ class Project(db.Model):
     def __repr__(self):
         return "<Project name={}>".format(self.project_name)
 
+class CollateDataSave(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
+    save_name = db.Column(db.String(50), index=False)
+    condition = db.Column(db.String(50), index=False)
+    condition_col = db.Column(db.String(50), index=False)
+    action = db.Column(db.String(50), index=False)
+    action_col = db.Column(db.String(50), index=False)
 
 class NewProjectForm(FlaskForm):
     project_name = StringField("project_name")
     upload_data = FileField(validators=[FileRequired()])
+
+
+class SaveCollateDataForm(FlaskForm):
+    name = StringField()
+
 
 class CollateDataForm(FlaskForm):
     condition = StringField()
@@ -98,6 +111,7 @@ def view_project(project_id):
     print("Setting project_data")
     session["project_data"] = data
     session["project_headers"] = headers
+    session["project_id"] = project_id
 
     return render_template("view_project.html",headers=headers,view_data=view_data,
                            truncated=truncated,project_name=project.project_name,rows=len(data))
@@ -142,6 +156,11 @@ def project_collate_data():
             collate_data = collate_func(session["project_data"],form.condition_col.data)
             action_func = collate_actions[form.action.data]
             final_data = action_func(collate_data,form.action_col.data)
+            # Set session variables so collate data commands can be saved
+            session["collate_data_condition"] = form.condition.data
+            session["collate_data_condition_col"] = form.condition_col.data
+            session["collate_data_action"] = form.action.data
+            session["collate_data_action_col"] = form.action_col.data
             # Change the format of the final_data output so it's the same format as the
             # view raw project data for example
             output_data = []
@@ -149,6 +168,19 @@ def project_collate_data():
                 output_data.append({form.condition_col.data: key,
                                    form.action_col.data: val})
 
-            print(final_data)
             return render_template("collate_output.html",data=output_data,headers=[
                 form.condition_col.data,form.action_col.data])
+
+@app.route("/collate/save",methods=["POST"])
+def save_collated():
+    form = SaveCollateDataForm(request.form,csrf_enabled=False)
+    if form.validate_on_submit():
+        save_name = form.name.data
+        collated = CollateDataSave(save_name=save_name,project_id=session["project_id"],
+                                   condition=session["collate_data_condition"],
+                                   condition_col=session["collate_data_condition_col"],
+                                   action=session["collate_data_action"],action_col=session["collate_data_action_col"])
+        db.session.add(collated)
+        db.session.commit()
+
+        return redirect(url_for("view_project",project_id=session["project_id"]))
