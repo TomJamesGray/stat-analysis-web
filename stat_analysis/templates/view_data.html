@@ -69,6 +69,45 @@
                     </div>
                 </div>
             </div>
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="graphHead">
+                    <h4 class="panel-title">
+                        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion"
+                           href="#graphSetup" aria-expanded="false" aria-controls="information">
+                            Graph
+                        </a>
+                    </h4>
+                </div>
+                <div id="graphSetup" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label for="graph_type">Graph type</label>
+                            <select name="graph_type" id="graph_type">
+                                <option value="scatter">Scatter</option>
+                                <option value="line">Line</option>
+                                <option value="bar">Bar</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="x_axis">X Axis</label>
+                            <select name="x_axis" id="x_axis">
+                                {% for header in headers %}
+                                    <option value="{{ header }}">{{ header }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="y_axis">Y Axis</label>
+                            <select name="y_axis" id="y_axis">
+                                {% for header in headers %}
+                                    <option value="{{ header }}">{{ header }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" id="graph_it_btn" class="btn btn-primary">Graph it</button>
+                    </div>
+                </div>
+            </div>
             {% if already_collated is not defined %}
             <div class="panel panel-default">
                 <div class="panel-heading" role="tab" id="collateHead">

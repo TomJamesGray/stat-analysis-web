@@ -13,4 +13,22 @@ $(function(){
             $(this).parent().parent().remove();
         }
     });
+    $('#graph_it_btn').on("click",function(){
+        // I don't really know or like javascript, please help :(
+
+        var result = "";
+        $.ajax({
+            url:'/api/get_active_data',
+            async:false,
+            success: function(data){
+                result = data;
+            }
+        });
+        data = result["data"]
+        headers = result["headers"]
+        x_axis = $('#x_axis').find(":selected").text();
+        y_axis = $('#y_axis').find(":selected").text();
+        console.log(x_axis)
+        console.log(y_axis)
+    });
 });

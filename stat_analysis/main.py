@@ -9,7 +9,7 @@ from collections import OrderedDict
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired
 from wtforms import StringField
-from flask import Flask,render_template,request,flash,redirect,url_for,session
+from flask import Flask,render_template,request,flash,redirect,url_for,session,jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_kvsession import KVSessionExtension
 from simplekv.memory.redisstore import RedisStore
@@ -222,3 +222,10 @@ def collate_data(c_func_name,c_col,a_func_name,a_col):
         output_data.append({c_col: key, a_col: val})
 
     return output_data
+
+@app.route("/api/get_active_data")
+def get_active_data():
+    return jsonify(headers=session["{}_headers".format(session["active_data"])],
+            data=session["{}_data".format(session["active_data"])])
+    # return jsonify(test="HI")
+    # return jsonify(headers=session["active_data"])
