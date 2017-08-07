@@ -11,3 +11,7 @@ root-container{
 .auto-width{
     width:auto !important;
 }
+.data-table{
+    display:block;
+    overflow-x:scroll;
+}
