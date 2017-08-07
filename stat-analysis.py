@@ -1,5 +1,4 @@
-from stat_analysis import main
-import sys
+from app import app
 
 if __name__ == "__main__":
-    main.main(sys.argv[1:])
+    app.app.run(debug=True)

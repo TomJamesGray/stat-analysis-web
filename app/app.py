@@ -3,8 +3,6 @@ import os
 import csv
 import re
 import redis
-import stat_analysis.collate.conditions
-import stat_analysis.collate.actions
 from collections import OrderedDict
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired
@@ -19,29 +17,15 @@ from werkzeug.datastructures import CombinedMultiDict
 logger = logging.getLogger(__name__)
 store = RedisStore(redis.StrictRedis())
 app = Flask(__name__)
-app.config.from_object('stat_analysis.config')
+app.config.from_object('app.config')
 app.secret_key = "SECRET"
 KVSessionExtension(store,app)
-
 db = SQLAlchemy(app)
 
 
-class Project(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    project_name = db.Column(db.String(50), index=True)
-    dataset_location = db.Column(db.String(50), index=True)
+from app.models import *
+from app import collate
 
-    def __repr__(self):
-        return "<Project name={}>".format(self.project_name)
-
-class CollateDataSave(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    project_id = db.Column(db.Integer, db.ForeignKey("project.id"), index=True)
-    save_name = db.Column(db.String(50), index=False)
-    condition = db.Column(db.String(50), index=False)
-    condition_col = db.Column(db.String(50), index=False)
-    action = db.Column(db.String(50), index=False)
-    action_col = db.Column(db.String(50), index=False)
 
 class NewProjectForm(FlaskForm):
     project_name = StringField("project_name")
@@ -149,10 +133,10 @@ def project_search():
 @app.route("/collate",methods=["GET","POST"])
 def project_collate_data():
     collate_conditions = {
-        "matches":stat_analysis.collate.conditions.matches
+        "matches":collate.conditions.matches
     }
     collate_actions = {
-        "sum":stat_analysis.collate.actions.sum
+        "sum":collate.actions.sum
     }
     if request.method == "POST":
         form = CollateDataForm(request.form,csrf_enabled=False)
@@ -169,7 +153,6 @@ def project_collate_data():
             session["collate_data_condition_col"] = form.condition_col.data
             session["collate_data_action"] = form.action.data
             session["collate_data_action_col"] = form.action_col.data
-
 
             return render_template("view_data.html",view_data=output_data,headers=[
                 form.condition_col.data,form.action_col.data],already_collated=True)
@@ -205,10 +188,10 @@ def view_collate_data(collate_id):
 
 def collate_data(c_func_name,c_col,a_func_name,a_col):
     collate_conditions = {
-        "matches": stat_analysis.collate.conditions.matches
+        "matches": collate.conditions.matches
     }
     collate_actions = {
-        "sum": stat_analysis.collate.actions.sum
+        "sum": collate.actions.sum
     }
     c_func = collate_conditions[c_func_name]
     collate_data = c_func(session["project_data"], c_col)
