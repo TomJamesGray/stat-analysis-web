@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% import "table.html" as table %}
+{% block body %}
+    <div class="container root-container">
+        <h2>Collate results</h2>
+        <p><b>Results:</b> {{ data|length }}</p>
+        {{ table.table_view(headers,data,truncated) }}
+    </div>
+{% endblock body %}

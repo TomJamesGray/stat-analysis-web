@@ -142,5 +142,13 @@ def project_collate_data():
             collate_data = collate_func(session["project_data"],form.condition_col.data)
             action_func = collate_actions[form.action.data]
             final_data = action_func(collate_data,form.action_col.data)
+            # Change the format of the final_data output so it's the same format as the
+            # view raw project data for example
+            output_data = []
+            for key,val in final_data.items():
+                output_data.append({form.condition_col.data: key,
+                                   form.action_col.data: val})
 
-            return str(final_data)
+            print(final_data)
+            return render_template("collate_output.html",data=output_data,headers=[
+                form.condition_col.data,form.action_col.data])
