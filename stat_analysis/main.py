@@ -164,7 +164,7 @@ def project_collate_data():
             session["collate_data_action_col"] = form.action_col.data
 
             return render_template("view_data.html",view_data=output_data,headers=[
-                form.condition_col.data,form.action_col.data])
+                form.condition_col.data,form.action_col.data],already_collated=True)
 
 
 @app.route("/collate/save",methods=["POST"])
