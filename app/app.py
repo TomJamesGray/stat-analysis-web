@@ -4,9 +4,6 @@ import csv
 import re
 import redis
 from collections import OrderedDict
-from flask_wtf import FlaskForm
-from flask_wtf.file import FileField, FileRequired
-from wtforms import StringField
 from flask import Flask,render_template,request,flash,redirect,url_for,session,jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_kvsession import KVSessionExtension
@@ -22,25 +19,10 @@ app.secret_key = "SECRET"
 KVSessionExtension(store,app)
 db = SQLAlchemy(app)
 
-
 from app.models import *
+from app.forms import *
 from app import collate
 
-
-class NewProjectForm(FlaskForm):
-    project_name = StringField("project_name")
-    upload_data = FileField(validators=[FileRequired()])
-
-
-class SaveCollateDataForm(FlaskForm):
-    name = StringField()
-
-
-class CollateDataForm(FlaskForm):
-    condition = StringField()
-    condition_col = StringField()
-    action = StringField()
-    action_col = StringField()
 
 @app.route("/")
 def index():
@@ -132,12 +114,6 @@ def project_search():
 
 @app.route("/collate",methods=["GET","POST"])
 def project_collate_data():
-    collate_conditions = {
-        "matches":collate.conditions.matches
-    }
-    collate_actions = {
-        "sum":collate.actions.sum
-    }
     if request.method == "POST":
         form = CollateDataForm(request.form,csrf_enabled=False)
         if form.validate_on_submit():
@@ -163,6 +139,7 @@ def save_collated():
     form = SaveCollateDataForm(request.form,csrf_enabled=False)
     if form.validate_on_submit():
         save_name = form.name.data
+        # Create collate data save instance
         collated = CollateDataSave(save_name=save_name,project_id=session["project_id"],
                                    condition=session["collate_data_condition"],
                                    condition_col=session["collate_data_condition_col"],
@@ -175,18 +152,37 @@ def save_collated():
 
 @app.route("/collate/view/<collate_id>")
 def view_collate_data(collate_id):
+    # Get save data for the collated data
     save = CollateDataSave.query.filter_by(id=collate_id).first()
     data = collate_data(save.condition,save.condition_col,save.action,save.action_col)
+    # Set the active data
     session["active_data"] = "collate"
     session["collate_data"] = data
     session["collate_headers"] = [save.condition_col, save.action_col]
-    # return render_template("collate_output.html", data=data, headers=[
-    #     save.condition_col, save.action_col], name=save.save_name)
     return render_template("view_data.html",headers=[save.condition_col, save.action_col],view_data=data,
                            project_name=save.save_name,already_collated=True)
 
 
+@app.route("/api/get_active_data")
+def get_active_data():
+    """
+    Gets the active data set and headers for it
+    :return: In JSON format the headers and data for the active data set
+    """
+    return jsonify(headers=session["{}_headers".format(session["active_data"])],
+            data=session["{}_data".format(session["active_data"])])
+
+
 def collate_data(c_func_name,c_col,a_func_name,a_col):
+    """
+    Generic collate data function
+    :param c_func_name: Condition function
+    :param c_col: Condition column the condition function will work on
+    :param a_func_name: The action function, ie what will happen with the result
+    of the condition function
+    :param a_col: Action column - The column the action function will work on
+    :return: The collated data set
+    """
     collate_conditions = {
         "matches": collate.conditions.matches
     }
@@ -205,10 +201,3 @@ def collate_data(c_func_name,c_col,a_func_name,a_col):
         output_data.append({c_col: key, a_col: val})
 
     return output_data
-
-@app.route("/api/get_active_data")
-def get_active_data():
-    return jsonify(headers=session["{}_headers".format(session["active_data"])],
-            data=session["{}_data".format(session["active_data"])])
-    # return jsonify(test="HI")
-    # return jsonify(headers=session["active_data"])
