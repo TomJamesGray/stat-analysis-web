@@ -15,7 +15,6 @@ $(function(){
     });
     $('#graph_it_btn').on("click",function(){
         // I don't really know or like javascript, please help :(
-
         var result = "";
         $.ajax({
             url:'/api/get_active_data',
@@ -30,5 +29,25 @@ $(function(){
         y_axis = $('#y_axis').find(":selected").text();
         console.log(x_axis)
         console.log(y_axis)
+        // Get data for x axis
+        var x_data = [];
+        for (var i=0; i<data.length; i++){
+            x_data.push(data[i][x_axis]);
+        }
+
+        // Get data for y axis
+        var y_data = [];
+        for (var i=0; i<data.length; i++){
+            y_data.push(data[i][y_axis]);
+        }
+        console.log("x_data " + x_data);
+        console.log("y_data " + y_data);
+        var trace1 = {
+            x:x_data,
+            y:y_data,
+            mode:"lines",
+            type:"scatter"
+        };
+        Plotly.newPlot("graph_output",[trace1]);
     });
 });
