@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block body %}
+    <div class="container root-container">
+        <h2 class="text-center">Setup Columns</h2>
+        <form method="POST" action="{{ url_for('new_project_columns') }}">
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <th>Column names</th>
+                        <th>Data Type</th>
+                        <th>Format</th>
+                    </tr>
+                    {% for h_index,header in headers %}
+                        <tr>
+                            <td>{{ header }}</td>
+                            <td>
+                                <select name="{{ h_index }}_data_type" class="col_setup_data_type">
+                                    <option value="string" selected="selected">String</option>
+                                    <option value="numeric">Numeric</option>
+                                    <option value="datetime">Date Time</option>
+                                </select>
+                            </td>
+                            <td><input name="{{ h_index }}_format" type="text" disabled="disabled"></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </form>
+    </div>
+{% endblock %}

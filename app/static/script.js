@@ -50,4 +50,16 @@ $(function(){
         };
         Plotly.newPlot("graph_output",[trace1]);
     });
+
+    $('.col_setup_data_type').on("click",function(){
+        d_type = $(this).find(":selected").attr("value");
+        console.log(d_type)
+        // If d_type is datetime then allow format column to be filled in
+        if (d_type == "datetime"){
+            $(this).parent().parent().find("input[type=text]").removeAttr("disabled");
+        }
+        else{
+            $(this).parent().parent().find("input[type=text]").attr("disabled","disabled");
+        }
+    });
 });

@@ -43,13 +43,25 @@ def new():
             project = Project(project_name=form.project_name.data,dataset_location=fname)
             db.session.add(project)
             db.session.commit()
+            session["project_id"] = project.id
 
-            return redirect(url_for("index"))
+            return redirect(url_for("new_project_columns"))
         else:
             print(form.errors)
             print("Stuff missing??")
 
     return render_template("new_project.html")
+
+
+@app.route("/new/column_setup", methods=["GET","POST"])
+def new_project_columns():
+    # Read in header row from data file for project
+    project = Project.query.filter_by(id=session["project_id"]).first()
+    with open("/home/tom/uploads/{}".format(project.dataset_location),'r') as f:
+        reader = csv.reader(f)
+        headers = next(reader)
+
+    return render_template("new_project_col_setup.html", headers=enumerate(headers))
 
 
 @app.route("/view/<project_id>")
