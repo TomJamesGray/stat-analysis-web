@@ -128,16 +128,19 @@
                                 </label>
                                 <select name="condition_col" id="condition_col">
                                     {% for header in headers %}
-                                        <option value="{{ header.name }}">{{ header.name }}</option>
+                                        <option value="{{ header.name }}" data-d-type="{{ header.d_type }}">
+                                            {{ header.name }}
+                                        </option>
                                     {% endfor %}
                                 </select>
-                                <label for="condition">
+                                <label for="collate_condition">
                                     Condition:
                                 </label>
-                                <select name="condition" id="condition">
+                                <select name="condition" id="collate_condition">
                                     <option value="matches">Matches</option>
                                     <option value="matches_regex">Matches Regex</option>
                                     <option value="in_range">In Range</option>
+                                    <option value="same_hour" data-dt-only="true" disabled="disabled">Same Hour</option>
                                 </select>
                             </div>
                             <div class="form-group">

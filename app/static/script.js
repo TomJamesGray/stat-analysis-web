@@ -62,4 +62,24 @@ $(function(){
             $(this).parent().parent().find("input[type=text]").attr("disabled","disabled");
         }
     });
+
+    $('#condition_col').on("change",function(){
+        d_type = $(this).find(":selected").attr("data-d-type")
+        conditions = $(this).parent().parent().find("#collate_condition");
+        options = conditions.children()
+        if (d_type == "datetime"){
+            for (var i=0; i<options.length; i++){
+                if ($(options[i]).attr("data-dt-only") == "true"){
+                    $(options[i]).removeAttr("disabled");
+                }
+            }
+        }
+        else{
+            for (var i=0; i<options.length; i++){
+                if ($(options[i]).attr("data-dt-only") == "true"){
+                    $(options[i]).attr("disabled","disabled");
+                }
+            }
+        }
+    });
 });
