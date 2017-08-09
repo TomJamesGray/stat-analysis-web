@@ -55,11 +55,24 @@ def new():
 
 @app.route("/new/column_setup", methods=["GET","POST"])
 def new_project_columns():
-    # Read in header row from data file for project
     project = Project.query.filter_by(id=session["project_id"]).first()
-    with open("/home/tom/uploads/{}".format(project.dataset_location),'r') as f:
+    # Read in header row from data file for project
+    with open("/home/tom/uploads/{}".format(project.dataset_location), 'r') as f:
         reader = csv.reader(f)
         headers = next(reader)
+
+    if request.method == "POST":
+        for i in range(0,len(headers)):
+            if request.form["{}_data_type".format(i)] == "datetime":
+                f_mat = request.form["{}_format".format(i)]
+            else:
+                f_mat = None
+
+            col = Column(project_id=project.id,position=i,d_type=request.form["{}_data_type".format(i)],format=f_mat)
+            db.session.add(col)
+            db.session.commit()
+
+        return redirect(url_for("view_project",project_id=project.id))
 
     return render_template("new_project_col_setup.html", headers=enumerate(headers))
 

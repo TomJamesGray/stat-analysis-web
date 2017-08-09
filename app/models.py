@@ -18,3 +18,11 @@ class CollateDataSave(db.Model):
     condition_col = db.Column(db.String(50), index=False)
     action = db.Column(db.String(50), index=False)
     action_col = db.Column(db.String(50), index=False)
+
+
+class Column(db.Model):
+    id = db.Column(db.Integer,primary_key=True)
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id"), index=True)
+    position = db.Column(db.Integer)
+    d_type = db.Column(db.String(20))
+    format = db.Column(db.String(50), nullable=True)
