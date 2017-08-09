@@ -128,7 +128,7 @@
                                 </label>
                                 <select name="condition_col" id="condition_col">
                                     {% for header in headers %}
-                                    <option value="{{ header }}">{{ header }}</option>
+                                        <option value="{{ header.name }}">{{ header.name }}</option>
                                     {% endfor %}
                                 </select>
                                 <label for="condition">
@@ -152,7 +152,7 @@
                                 </label>
                                 <select name="action_col" id="action_col">
                                     {% for header in headers %}
-                                        <option value="{{ header }}">{{ header }}</option>
+                                        <option value="{{ header.name }}">{{ header.name }}</option>
                                     {% endfor %}
                                 </select>
                             </div>

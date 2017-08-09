@@ -68,7 +68,8 @@ def new_project_columns():
             else:
                 f_mat = None
 
-            col = Column(project_id=project.id,position=i,d_type=request.form["{}_data_type".format(i)],format=f_mat)
+            col = Column(project_id=project.id,position=i,d_type=request.form["{}_data_type".format(i)],format=f_mat,
+                         name=request.form["{}_name".format(i)])
             db.session.add(col)
             db.session.commit()
 
@@ -83,11 +84,11 @@ def view_project(project_id):
     # Assuming there is a header row
     project = Project.query.filter_by(id=project_id).first()
     collate_data_saves = CollateDataSave.query.filter_by(project_id=project_id).all()
+    headers = Column.query.filter_by(project_id=project.id).order_by(Column.position).all()
 
-    print(project)
     with open("/home/tom/uploads/{}".format(project.dataset_location),'r') as f:
         reader = csv.reader(f)
-        headers = next(reader)
+        _ = next(reader)
         data = []
         for row in reader:
             tmp = OrderedDict()

@@ -24,5 +24,9 @@ class Column(db.Model):
     id = db.Column(db.Integer,primary_key=True)
     project_id = db.Column(db.Integer, db.ForeignKey("project.id"), index=True)
     position = db.Column(db.Integer)
+    name = db.Column(db.String(50))
     d_type = db.Column(db.String(20))
     format = db.Column(db.String(50), nullable=True)
+
+    def __repr__(self):
+        return "<Column project_id={} position={}>".format(self.project_id,self.position)

@@ -3,7 +3,7 @@
     <tbody>
         <tr>
             {% for header in headers %}
-                <th>{{ header }}</th>
+                <th>{{ header.name }}</th>
             {% endfor %}
         </tr>
         {% for row in data %}

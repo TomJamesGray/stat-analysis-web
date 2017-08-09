@@ -12,7 +12,9 @@
                     </tr>
                     {% for h_index,header in headers %}
                         <tr>
-                            <td>{{ header }}</td>
+                            <td>
+                                <input type="text" name="{{ h_index }}_name" value="{{ header }}">
+                            </td>
                             <td>
                                 <select name="{{ h_index }}_data_type" class="col_setup_data_type">
                                     <option value="string" selected="selected">String</option>
