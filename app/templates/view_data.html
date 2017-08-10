@@ -137,10 +137,9 @@
                                     Condition:
                                 </label>
                                 <select name="condition" id="collate_condition">
-                                    <option value="matches">Matches</option>
-                                    <option value="matches_regex">Matches Regex</option>
-                                    <option value="in_range">In Range</option>
-                                    <option value="same_hour" data-dt-only="true" disabled="disabled">Same Hour</option>
+                                    <option value="matches" data-d-types="string numeric datetime">Matches</option>
+                                    <option value="matches_regex" data-d-types="string numeric datetime">Matches Regex</option>
+                                    <option value="same_hour" data-d-types="datetime">Same Hour</option>
                                 </select>
                             </div>
                             <div class="form-group">

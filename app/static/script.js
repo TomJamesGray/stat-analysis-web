@@ -63,23 +63,26 @@ $(function(){
         }
     });
 
-    $('#condition_col').on("change",function(){
-        d_type = $(this).find(":selected").attr("data-d-type")
-        conditions = $(this).parent().parent().find("#collate_condition");
+    function update_conditions_avail(h_select){
+        d_type = $(h_select).find(":selected").attr("data-d-type")
+        conditions = $(h_select).parent().parent().find("#collate_condition");
         options = conditions.children()
-        if (d_type == "datetime"){
-            for (var i=0; i<options.length; i++){
-                if ($(options[i]).attr("data-dt-only") == "true"){
-                    $(options[i]).removeAttr("disabled");
-                }
+        for (var i=0; i<options.length; i++){
+            d_types = $(options[i]).attr("data-d-types").split(" ")
+            if ($.inArray(d_type,d_types) > -1){
+                $(options[i]).removeAttr("disabled")
+            }
+            else{
+                $(options[i]).attr("disabled","disabled")
             }
         }
-        else{
-            for (var i=0; i<options.length; i++){
-                if ($(options[i]).attr("data-dt-only") == "true"){
-                    $(options[i]).attr("disabled","disabled");
-                }
-            }
-        }
+    }
+
+    $('#condition_col').on("change",function(){
+        update_conditions_avail(this);
+    });
+
+    $('#condition_col').on("load",function(){
+        update_conditions_avail(this);
     });
 });
