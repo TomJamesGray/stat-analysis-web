@@ -210,11 +210,13 @@ def collate_data(c_func_name,c_col,a_func_name,a_col):
     :return: The collated data set
     """
     collate_conditions = {
-        "matches": collate.conditions.matches
+        "matches": collate.conditions.matches,
+        "same_hour": collate.conditions.same_hour
     }
     collate_actions = {
         "sum": collate.actions.sum
     }
+    c_col = Column.query.filter_by(project_id=session["project_id"],name=c_col).first()
     c_func = collate_conditions[c_func_name]
     collate_data = c_func(session["project_data"], c_col)
     a_func = collate_actions[a_func_name]
