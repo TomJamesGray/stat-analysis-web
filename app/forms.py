@@ -29,3 +29,12 @@ class ColumnSetup(FlaskForm):
 
 class ColumnSetupForm(FlaskForm):
     columns = FieldList(FormField(ColumnSetup))
+
+
+class SearchCriteria(FlaskForm):
+    column = StringField()
+    regex_search = StringField()
+
+
+class SearchForm(FlaskForm):
+    criterion = FieldList(FormField(SearchCriteria))

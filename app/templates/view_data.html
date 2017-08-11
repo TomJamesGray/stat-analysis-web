@@ -42,19 +42,20 @@
                 <div id="search" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
                     <div class="panel-body">
                         <form method="post" class="auto-width" action="{{ url_for('project_search') }}">
+                            {{ search_form.csrf_token }}
                             <fieldset id="search_rows">
                                 <table class="table auto-width" id="search_rows_tbl">
                                     <tbody>
-                                        <tr class="search_row">
+                                        <tr class="search_row" data-index="0">
                                             <td>
-                                                <select name="column_select[]">
+                                                <select name="criterion-0-column">
                                                     {% for header in headers %}
-                                                        <option value="{{ header }}">{{ header }}</option>
+                                                        <option value="{{ header }}">{{ header.name }}</option>
                                                     {% endfor %}
                                                 </select>
                                             </td>
                                             <td>
-                                                <input type="text" name="regex_search[]" placeholder="Regex search pattern">
+                                                <input type="text" name="criterion-0-regex_search" placeholder="Regex search pattern">
                                             </td>
                                             <td>
                                                 <button class="btn btn-danger remove_search_row" type="button" disabled="disabled">-</button>

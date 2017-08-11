@@ -4,6 +4,11 @@ $(function(){
         $trLast = $tableBody.find("tr:last"),
         $trNew = $trLast.clone(true);
 
+        var new_index = parseInt($trLast.attr("data-index"))+1;
+        $trNew.attr("data-index",new_index);
+        $trNew.find("select").attr("name","criterion-" + new_index + "-column");
+        $trNew.find("input[type=text]").attr("name","criterion-" + new_index + "-regex_search");
+
         $trLast.after($trNew);
         $('.remove_search_row').removeAttr("disabled")
     });

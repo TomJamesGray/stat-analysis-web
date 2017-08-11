@@ -85,6 +85,7 @@ def new_project_columns():
 def view_project(project_id):
     # Read data from data file
     # Assuming there is a header row
+    search_form = SearchForm()
     project = Project.query.filter_by(id=project_id).first()
     collate_data_saves = CollateDataSave.query.filter_by(project_id=project_id).all()
     headers = Column.query.filter_by(project_id=project.id).order_by(Column.position).all()
@@ -113,7 +114,7 @@ def view_project(project_id):
 
     return render_template("view_data.html",headers=headers,view_data=view_data,
                            truncated=truncated,project_name=project.project_name,rows=len(data),
-                           collate_data_saves=collate_data_saves)
+                           collate_data_saves=collate_data_saves,search_form=search_form)
 
 
 @app.route("/view")
@@ -126,19 +127,22 @@ def view():
 @app.route("/search", methods=["GET","POST"])
 def project_search():
     if request.method == "POST":
-        # Use WTForms?
-        cols = request.form.getlist("column_select[]")
-        regexes = request.form.getlist("regex_search[]")
-        output = []
-        for row in session["{}_data".format(session["active_data"])]:
-            matched = 0
-            for i in range(0,len(cols)):
-                if re.search(regexes[i],row[cols[i]]):
-                    matched += 1
-            if matched == len(cols):
-                output.append(row)
-        return render_template("search_results.html",data=output,
-                               headers=session["{}_headers".format(session["active_data"])])
+        form = SearchForm(request.form)
+        if form.validate_on_submit():
+            print(form.criterion.data)
+            # Use WTForms?
+            cols = request.form.getlist("column_select[]")
+            regexes = request.form.getlist("regex_search[]")
+            output = []
+            for row in session["{}_data".format(session["active_data"])]:
+                matched = 0
+                for i in range(0,len(cols)):
+                    if re.search(regexes[i],row[cols[i]]):
+                        matched += 1
+                if matched == len(cols):
+                    output.append(row)
+            return render_template("search_results.html",data=output,
+                                   headers=session["{}_headers".format(session["active_data"])])
 
 
 @app.route("/collate",methods=["GET","POST"])
