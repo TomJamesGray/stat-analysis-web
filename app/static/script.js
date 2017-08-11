@@ -56,10 +56,10 @@ $(function(){
         console.log(d_type)
         // If d_type is datetime then allow format column to be filled in
         if (d_type == "datetime"){
-            $(this).parent().parent().find("input[type=text]").removeAttr("disabled");
+            $(this).parent().parent().find("input[type=text][name$=_format]").removeAttr("disabled");
         }
         else{
-            $(this).parent().parent().find("input[type=text]").attr("disabled","disabled");
+            $(this).parent().parent().find("input[type=text][name$=_format]").attr("disabled","disabled");
         }
     });
 
