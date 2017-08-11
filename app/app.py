@@ -9,11 +9,12 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_kvsession import KVSessionExtension
 from simplekv.memory.redisstore import RedisStore
 from werkzeug.utils import secure_filename
-from werkzeug.datastructures import CombinedMultiDict
+from flask_wtf.csrf import CSRFProtect
 
 logger = logging.getLogger(__name__)
 store = RedisStore(redis.StrictRedis())
 app = Flask(__name__)
+csrf = CSRFProtect(app)
 app.config.from_object('app.config')
 app.secret_key = "SECRET"
 KVSessionExtension(store,app)
@@ -23,6 +24,7 @@ from app.models import *
 from app.forms import *
 from app import collate
 
+logger = logging.getLogger(__name__)
 
 @app.route("/")
 def index():
@@ -31,9 +33,8 @@ def index():
 
 @app.route("/new", methods=["GET","POST"])
 def new():
+    form = NewProjectForm()
     if request.method == "POST":
-        # TODO: Actually enable CSRF
-        form = NewProjectForm(CombinedMultiDict((request.files,request.form)),csrf_enabled=False)
         if form.validate_on_submit():
             f = form.upload_data.data
             fname = secure_filename(f.filename)
@@ -47,10 +48,11 @@ def new():
 
             return redirect(url_for("new_project_columns"))
         else:
+            logger.warning("New project form errors: {}".format(form.errors))
             print(form.errors)
             print("Stuff missing??")
 
-    return render_template("new_project.html")
+    return render_template("new_project.html",form=form)
 
 
 @app.route("/new/column_setup", methods=["GET","POST"])
