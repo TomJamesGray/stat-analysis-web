@@ -57,6 +57,7 @@ def new():
 
 @app.route("/new/column_setup", methods=["GET","POST"])
 def new_project_columns():
+    form = ColumnSetupForm()
     project = Project.query.filter_by(id=session["project_id"]).first()
     # Read in header row from data file for project
     with open("/home/tom/uploads/{}".format(project.dataset_location), 'r') as f:
@@ -64,20 +65,20 @@ def new_project_columns():
         headers = next(reader)
 
     if request.method == "POST":
-        for i in range(0,len(headers)):
-            if request.form["{}_data_type".format(i)] == "datetime":
-                f_mat = request.form["{}_format".format(i)]
-            else:
-                f_mat = None
+        if form.validate_on_submit():
+            for i,col in enumerate(form.columns.data):
+                if col["d_type"] == "datetime":
+                    f_mat = col["format"]
+                else:
+                    f_mat = None
 
-            col = Column(project_id=project.id,position=i,d_type=request.form["{}_data_type".format(i)],format=f_mat,
-                         name=request.form["{}_name".format(i)])
-            db.session.add(col)
-            db.session.commit()
+                col = Column(project_id=project.id,position=i,d_type=col["d_type"],format=f_mat,name=col["name"])
+                db.session.add(col)
+                db.session.commit()
 
         return redirect(url_for("view_project",project_id=project.id))
 
-    return render_template("new_project_col_setup.html", headers=enumerate(headers))
+    return render_template("new_project_col_setup.html",form=form, headers=enumerate(headers))
 
 
 @app.route("/view/<project_id>")

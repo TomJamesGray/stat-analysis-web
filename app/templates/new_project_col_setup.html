@@ -3,6 +3,7 @@
     <div class="container root-container">
         <h2 class="text-center">Setup Columns</h2>
         <form method="POST" action="{{ url_for('new_project_columns') }}">
+            {{ form.csrf_token }}
             <table class="table">
                 <tbody>
                     <tr>
@@ -13,16 +14,16 @@
                     {% for h_index,header in headers %}
                         <tr>
                             <td>
-                                <input type="text" name="{{ h_index }}_name" value="{{ header }}">
+                                <input type="text" name="columns-{{ h_index }}-name" value="{{ header }}">
                             </td>
                             <td>
-                                <select name="{{ h_index }}_data_type" class="col_setup_data_type">
+                                <select name="columns-{{ h_index }}-d_type" class="col_setup_data_type">
                                     <option value="string" selected="selected">String</option>
                                     <option value="numeric">Numeric</option>
                                     <option value="datetime">Date Time</option>
                                 </select>
                             </td>
-                            <td><input name="{{ h_index }}_format" type="text" disabled="disabled"></td>
+                            <td><input name="columns-{{ h_index }}-format" type="text" disabled="disabled"></td>
                         </tr>
                     {% endfor %}
                 </tbody>
